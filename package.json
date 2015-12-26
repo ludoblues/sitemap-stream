@@ -1,0 +1,37 @@
+{
+  "name": "sitemap-stream",
+  "version": "0.0.9",
+  "description": "Simple and fast sitemap stream that respects google rules",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --harmony ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+  },
+  "engines": {
+    "node": ">=5.x.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludoblues/sitemap-stream.git"
+  },
+  "keywords": [
+    "sitemap",
+    "generator",
+    "stream"
+  ],
+  "author": "Ludovic VUE",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ludoblues/sitemap-stream/issues"
+  },
+  "homepage": "https://github.com/ludoblues/sitemap-stream#readme",
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "coveralls": "^2.11.6",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2"
+  },
+  "dependencies": {
+    "joi": "^7.0.1"
+  }
+}
