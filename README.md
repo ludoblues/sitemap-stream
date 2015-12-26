@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/ludoblues/sitemap-stream.svg?branch=master)](https://travis-ci.org/ludoblues/sitemap-stream)
-
 [![Coverage Status](https://coveralls.io/repos/ludoblues/sitemap-stream/badge.svg?branch=master&service=github)](https://coveralls.io/github/ludoblues/sitemap-stream?branch=master)
 
 # sitemap-stream
@@ -20,7 +19,7 @@ npm i sitemap-stream
 #### Constructor(options):
 ```js
 {
-  host: String,
+  hostname: String,
   limit: Number, // (default: 50000)
   isMobile: Boolean // (default: false)
 }
@@ -45,7 +44,7 @@ Options Case:
 ## Events
 
 SitemapStream use streams, so it emit events to let you know what happens.
-Here are the event you can listen to:
+Here are the events you can listen to:
 
 - error
 - drain
