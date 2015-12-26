@@ -1,6 +1,6 @@
 {
   "name": "sitemap-stream",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "description": "Simple and fast sitemap stream that respects google rules",
   "main": "index.js",
   "scripts": {
