@@ -53,7 +53,7 @@ Here are the events you can listen to:
 
 
 
-## Exemples
+## Examples
 
 Basic
 ```` js
