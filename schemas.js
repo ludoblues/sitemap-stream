@@ -7,7 +7,8 @@ module.exports = {
     hostname: Joi.string().hostname().default(''),
     date: Joi.date().iso().default(new Date().toISOString()),
     limit: Joi.number().integer().min(1).default(50000),
-    isMobile: Joi.boolean().default(false)
+    isMobile: Joi.boolean().default(false),
+    outputFolder: Joi.string().default('./')
   }),
 
   entry: Joi.object({
