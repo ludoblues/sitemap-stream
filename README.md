@@ -21,7 +21,8 @@ npm i sitemap-stream
 {
   hostname: String,
   limit: Number, // (default: 50000)
-  isMobile: Boolean // (default: false)
+  isMobile: Boolean, // (default: false)
+  outputFolder: String // (default: './')
 }
 ```
 
