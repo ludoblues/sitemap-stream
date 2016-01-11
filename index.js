@@ -15,6 +15,7 @@ class SitemapStream extends EventEmitter {
     this.date = conf.date;
     this.limit = conf.limit;
     this.isMobile = conf.isMobile;
+    this.outputFolder = conf.outputFolder;
 
     this.nbInjectedUrls = 0;
     this.writer = {};
@@ -25,7 +26,7 @@ class SitemapStream extends EventEmitter {
 
     if (nbFile > 1) this.endOfFile();
 
-    this.writer = fs.createWriteStream(`sitemap-${nbFile}.xml`);
+    this.writer = fs.createWriteStream(`${this.outputFolder}sitemap-${nbFile}.xml`);
 
     this.writer.on('finish', () => {
       this.emit('sitemap-created', `sitemap-${nbFile}.xml`);
@@ -60,7 +61,7 @@ class SitemapStream extends EventEmitter {
   }
 
   generateIndexFile() {
-    this.writer = fs.createWriteStream('sitemapindex.xml');
+    this.writer = fs.createWriteStream(`${this.outputFolder}sitemapindex.xml`);
 
     this.writer.on('error', this.emit);
     this.writer.on('drain', this.emit);
@@ -84,7 +85,7 @@ class SitemapStream extends EventEmitter {
 
   done() {
     this.endOfFile();
-    
+
     this.generateIndexFile();
   }
 }
