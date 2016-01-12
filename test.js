@@ -436,6 +436,31 @@ describe('SitemapStream', () => {
     });
   });
 
+  describe('#reset', () => {
+    let sitemap = require('./index')();
+
+    beforeEach('Override parameters', () => {
+      sitemap.nbInjectedUrls = 1000;
+      sitemap.writer = { foo: 'bar' };
+    });
+
+    it('should reset the #nbInjectedUrls', () => {
+      expect(sitemap.nbInjectedUrls).to.be.equal(1000);
+
+      sitemap.reset();
+
+      expect(sitemap.nbInjectedUrls).to.be.equal(0);
+    });
+
+    it('should reset the #writer', () => {
+      expect(sitemap.writer).to.be.eql({ foo: 'bar' });
+
+      sitemap.reset();
+
+      expect(sitemap.writer).to.be.eql({});
+    });
+  });
+
   describe('#endOfFile', () => {
     let sitemap = require('./index')();
 

@@ -16,7 +16,7 @@ You can find information about the sitemap's syntax [here](http://www.sitemaps.o
 npm i sitemap-stream
 
 ## Methods
-#### Constructor(options):
+#### SitemapStream#Constructor(options):
 ```js
 {
   hostname: String,
@@ -26,7 +26,7 @@ npm i sitemap-stream
 }
 ```
 
-#### inject(url || options)
+#### SitemapStream#inject(url || options)
 Url Case:
 ```js
 // The url
@@ -41,6 +41,10 @@ Options Case:
   priority: String
 }
 ````
+
+#### SitemapStream#reset
+Useful if you want to start writing a new sitemap using the same SitemapStream instance
+
 
 ## Events
 
