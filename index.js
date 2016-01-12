@@ -29,7 +29,7 @@ class SitemapStream extends EventEmitter {
     this.writer = fs.createWriteStream(`${this.outputFolder}sitemap-${nbFile}.xml`);
 
     this.writer.on('finish', () => {
-      this.emit('sitemap-created', `sitemap-${nbFile}.xml`);
+      this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
     });
 
     this.writer.on('error', this.emit);
@@ -67,7 +67,7 @@ class SitemapStream extends EventEmitter {
     this.writer.on('drain', this.emit);
 
     this.writer.on('finish', () => {
-      this.emit('sitemapindex-created');
+      this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
     });
 
     this.writer.write('<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');
