@@ -78,6 +78,11 @@ class SitemapStream extends EventEmitter {
     this.writer.end();
   }
 
+  reset() {
+    this.nbInjectedUrls = 0;
+    this.writer = {};
+  }
+
   endOfFile() {
     this.writer.write('</urlset>');
     this.writer.end();

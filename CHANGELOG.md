@@ -1,3 +1,7 @@
+## [1.4.0] - 2016-01-12
+### Added
+- The SitemapStream#reset method
+
 ## [1.3.0] - 2016-01-12
 ### Added
 - The sitemapindex-created event now emits the related path
