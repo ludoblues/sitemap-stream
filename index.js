@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const EventEmitter = require('events').EventEmitter;
+const zlib = require('zlib');
 
 const Joi = require('joi');
 
@@ -16,9 +17,23 @@ class SitemapStream extends EventEmitter {
     this.limit = conf.limit;
     this.isMobile = conf.isMobile;
     this.outputFolder = conf.outputFolder;
+    this.toCompress = conf.toCompress;
 
     this.nbInjectedUrls = 0;
     this.writer = {};
+  }
+
+  compress(path, done) {
+    const reader = fs.createReadStream(path);
+    const writer = fs.createWriteStream(`${path}.gz`);
+
+    const compressionStream = reader
+      .pipe(zlib.createGzip())
+      .pipe(writer);
+
+    compressionStream.on('finish', () => {
+      fs.unlink(path, done);
+    });
   }
 
   changeWriteStream() {
@@ -29,7 +44,11 @@ class SitemapStream extends EventEmitter {
     this.writer = fs.createWriteStream(`${this.outputFolder}sitemap-${nbFile}.xml`);
 
     this.writer.on('finish', () => {
-      this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+      if (!this.toCompress) return this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+
+      this.compress(`${this.outputFolder}sitemap-${nbFile}.xml`, () => {
+        this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+      });
     });
 
     this.writer.on('error', this.emit);
@@ -67,7 +86,11 @@ class SitemapStream extends EventEmitter {
     this.writer.on('drain', this.emit);
 
     this.writer.on('finish', () => {
-      this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
+      if (!this.toCompress) return this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
+
+      this.compress(`${this.outputFolder}sitemapindex.xml`, () => {
+        this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml.gz`);
+      });
     });
 
     this.writer.write('<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');

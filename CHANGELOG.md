@@ -1,3 +1,7 @@
+## [1.5.0] - 2016-01-18
+### Added
+- Add the gzip compression feature
+
 ## [1.4.0] - 2016-01-12
 ### Added
 - The SitemapStream#reset method

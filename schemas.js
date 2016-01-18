@@ -8,7 +8,8 @@ module.exports = {
     date: Joi.date().iso().default(new Date().toISOString()),
     limit: Joi.number().integer().min(1).default(50000),
     isMobile: Joi.boolean().default(false),
-    outputFolder: Joi.string().default('./')
+    outputFolder: Joi.string().default('./'),
+    toCompress: Joi.boolean().default(true)
   }),
 
   entry: Joi.object({
