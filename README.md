@@ -23,6 +23,7 @@ npm i sitemap-stream
   limit: Number, // (default: 50000)
   isMobile: Boolean, // (default: false)
   outputFolder: String // (default: './')
+  toCompress: Boolean // (default: true)
 }
 ```
 
@@ -96,7 +97,7 @@ With Events
   });
 
   sg.on('sitemapindex-index', () => {
-    // When this listener is triggered, consider the whole sitemaps genreation done
+    // When this listener is triggered, consider the whole sitemaps generation done
     console.log('The sitemapindex has been created, we are done !');
   });
 

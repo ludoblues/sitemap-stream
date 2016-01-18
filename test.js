@@ -2,6 +2,7 @@
 
 const exec = require('child_process').exec;
 const fs = require('fs');
+const zlib = require('zlib');
 
 const expect = require('chai').expect;
 const sinon = require('sinon');
@@ -52,13 +53,12 @@ describe('SitemapStream', () => {
         sitemap = require('./index')();
       });
 
-      // TODO: To avoid multiple listeners, is there something cleaner ?
       beforeEach('mute & spy #endOfFile', () => {
         sinon.stub(sitemap, 'endOfFile', () => {});
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #endOfFile spy', () => {
@@ -72,6 +72,8 @@ describe('SitemapStream', () => {
       });
 
       it('should have created the file', (done) => {
+        sitemap.toCompress = false;
+
         sitemap.on('sitemap-created', (fileName) => {
           fs.lstat(fileName, done);
         });
@@ -82,6 +84,8 @@ describe('SitemapStream', () => {
       });
 
       it('should not the file contain the mobile header', (done) => {
+        sitemap.toCompress = false;
+
         sitemap.on('sitemap-created', (fileName) => {
           const fileContent = fs.readFileSync(fileName);
 
@@ -121,7 +125,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #endOfFile spy', () => {
@@ -144,13 +148,12 @@ describe('SitemapStream', () => {
         sitemap = require('./index')({ isMobile: true });
       });
 
-      // TODO: To avoid multiple listeners, is there something cleaner ?
       beforeEach('mute & spy #endOfFile', () => {
         sinon.stub(sitemap, 'endOfFile', () => {});
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #endOfFile spy', () => {
@@ -158,12 +161,60 @@ describe('SitemapStream', () => {
       });
 
       it('should add the mobile header', (done) => {
+        sitemap.toCompress = false;
+        
         sitemap.on('sitemap-created', (fileName) => {
           const fileContent = fs.readFileSync(fileName);
 
           expect(fileContent.toString()).to.be.equal('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0">');
 
           done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+      });
+    });
+
+    context('We want to compress the generated sitemaps', (done) => {
+      let sitemap = require('./index')();
+
+      beforeEach('generate a new sitemap generator', () => {
+        sitemap = require('./index')();
+      });
+
+      beforeEach('mute & spy #endOfFile', () => {
+        sinon.stub(sitemap, 'endOfFile', () => {});
+      });
+
+      afterEach('should remove generated xml files', (done) => {
+        exec('rm *.xml*', done.bind(null, null));
+      });
+
+      afterEach('restore #endOfFile spy', () => {
+        sitemap.endOfFile.restore();
+      });
+
+      it('should have created the file', (done) => {
+        sitemap.on('sitemap-created', () => {
+          const reader = fs.createReadStream('sitemap-1.xml.gz');
+          const writer = fs.createWriteStream('sitemap-1.xml');
+
+          expect(fs.lstatSync('sitemap-1.xml.gz').size).to.be.gt(0);
+          expect(fs.lstatSync.bind('sitemap-1.xml.xml')).to.throw;
+
+          const compressionStream = reader
+            .pipe( zlib.createUnzip() )
+            .pipe(writer);
+
+          compressionStream.on('finish', () => {
+            const fileContent = fs.readFileSync('sitemap-1.xml');
+
+            expect(fileContent.toString()).to.be.equal('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+
+            done();
+          });
         });
 
         sitemap.changeWriteStream();
@@ -182,7 +233,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       it('should return an error', () => {
@@ -218,8 +269,9 @@ describe('SitemapStream', () => {
         sinon.stub(sitemap, 'changeWriteStream', () => {});
       });
 
+
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #changeWriteStream spy', () => {
@@ -268,7 +320,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #changeWriteStream spy', () => {
@@ -313,7 +365,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #changeWriteStream spy', () => {
@@ -345,7 +397,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #changeWriteStream spy', () => {
@@ -376,7 +428,7 @@ describe('SitemapStream', () => {
       });
 
       afterEach('should remove generated xml files', (done) => {
-        exec('rm *.xml', done.bind(null, null));
+        exec('rm *.xml*', done.bind(null, null));
       });
 
       afterEach('restore #changeWriteStream spy', () => {
@@ -401,7 +453,7 @@ describe('SitemapStream', () => {
     });
 
     afterEach('should remove generated xml files', (done) => {
-      exec('rm *.xml', done.bind(null, null));
+      exec('rm *.xml*', done.bind(null, null));
     });
 
     it('should emit an event "sitemapindex-created" when the sitemapindex is frozen', (done) => {
@@ -413,6 +465,8 @@ describe('SitemapStream', () => {
     });
 
     it('should have created a sitemapindex file', (done) => {
+      sitemap.toCompress = false;
+
       sitemap.on('sitemapindex-created', () => {
         fs.lstat('sitemapindex.xml', done);
       });
@@ -423,6 +477,7 @@ describe('SitemapStream', () => {
     it('should the sitemapindex file reference all the created sitemaps', (done) => {
       sitemap.nbInjectedUrls = sitemap.limit * 4;
       sitemap.date = new Date().toISOString();
+      sitemap.toCompress = false;
 
       sitemap.on('sitemapindex-created', () => {
         const fileContent = fs.readFileSync('sitemapindex.xml');
@@ -430,6 +485,35 @@ describe('SitemapStream', () => {
         expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n`);
 
         done();
+      });
+
+      sitemap.generateIndexFile();
+    });
+
+    it('should compress the file when asked in option', (done) => {
+      sitemap.toCompress = true;
+
+      sitemap.nbInjectedUrls = sitemap.limit * 4;
+      sitemap.date = new Date().toISOString();
+
+      sitemap.on('sitemapindex-created', () => {
+        const reader = fs.createReadStream('sitemapindex.xml.gz');
+        const writer = fs.createWriteStream('sitemapindex.xml');
+
+        expect(fs.lstatSync('sitemapindex.xml.gz').size).to.be.gt(0);
+        expect(fs.lstatSync.bind('sitemapindex.xml')).to.throw;
+
+        const compressionStream = reader
+          .pipe( zlib.createUnzip() )
+          .pipe(writer);
+
+        compressionStream.on('finish', () => {
+          const fileContent = fs.readFileSync('sitemapindex.xml');
+
+          expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n`);
+
+          done();
+        });
       });
 
       sitemap.generateIndexFile();
@@ -473,7 +557,7 @@ describe('SitemapStream', () => {
     });
 
     afterEach('should remove generated xml files', (done) => {
-      exec('rm *.xml', done.bind(null, null));
+      exec('rm *.xml*', done.bind(null, null));
     });
 
     it('should close the urlset element', (done) => {
