@@ -47,7 +47,7 @@ class SitemapStream extends EventEmitter {
       if (!this.toCompress) return this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
 
       this.compress(`${this.outputFolder}sitemap-${nbFile}.xml`, () => {
-        this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+        this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml.gz`);
       });
     });
 

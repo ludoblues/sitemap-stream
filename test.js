@@ -101,7 +101,7 @@ describe('SitemapStream', () => {
 
       it('should emit a "sitemap-created" event when the sitemap is frozen', (done) => {
         sitemap.on('sitemap-created', (fileName) => {
-          expect(fileName).to.be.equal('./sitemap-1.xml');
+          expect(fileName).to.be.equal('./sitemap-1.xml.gz');
 
           done();
         });
@@ -162,7 +162,7 @@ describe('SitemapStream', () => {
 
       it('should add the mobile header', (done) => {
         sitemap.toCompress = false;
-        
+
         sitemap.on('sitemap-created', (fileName) => {
           const fileContent = fs.readFileSync(fileName);
 

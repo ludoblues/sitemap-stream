@@ -1,3 +1,7 @@
+## [1.5.1] - 2016-01-21
+### Fixed
+- The compressed sitemap file's extension was missing in the sitemap-created event
+
 ## [1.5.0] - 2016-01-18
 ### Added
 - Add the gzip compression feature
