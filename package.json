@@ -4,7 +4,7 @@
   "description": "Simple and fast sitemap stream that respects google rules",
   "main": "index.js",
   "scripts": {
-    "test": "node --harmony ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --report lcovonly -- test.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": "node --harmony ./node_modules/istanbul/lib/cli.js cover -x test.js ./node_modules/mocha/bin/_mocha --report lcovonly -- test.js && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "engines": {
     "node": ">=5.x.x"
