@@ -1,3 +1,7 @@
+## [1.6.0] - 2016-02-09
+### Added
+- Add the done event
+
 ## [1.5.1] - 2016-01-21
 ### Fixed
 - The compressed sitemap file's extension was missing in the sitemap-created event
