@@ -21,6 +21,9 @@ class SitemapStream extends EventEmitter {
 
     this.nbInjectedUrls = 0;
     this.writer = {};
+
+    this.nbWrittenFiles = 0;
+    this.isInjectOverver = false;
   }
 
   compress(path, done) {
@@ -44,10 +47,19 @@ class SitemapStream extends EventEmitter {
     this.writer = fs.createWriteStream(`${this.outputFolder}sitemap-${nbFile}.xml`);
 
     this.writer.on('finish', () => {
-      if (!this.toCompress) return this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+      this.nbWrittenFiles++;
+
+      if (!this.toCompress) {
+        this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
+
+        if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
+
+        return ;
+      }
 
       this.compress(`${this.outputFolder}sitemap-${nbFile}.xml`, () => {
         this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml.gz`);
+        if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
       });
     });
 
@@ -74,9 +86,11 @@ class SitemapStream extends EventEmitter {
     const priority = entry.priority ? `<priority>${entry.priority}</priority>\n` : '';
     const mobile = this.isMobile ? '<mobile:mobile/>\n' : '';
 
-    this.writer.write(`${loc}${lastMod}${changeFreq}${priority}${mobile}`);
+    const isWritten = this.writer.write(`${loc}${lastMod}${changeFreq}${priority}${mobile}`);
 
-    this.nbInjectedUrls++;
+    if (isWritten) this.nbInjectedUrls++;
+
+    return isWritten;
   }
 
   generateIndexFile() {
@@ -86,10 +100,19 @@ class SitemapStream extends EventEmitter {
     this.writer.on('drain', this.emit);
 
     this.writer.on('finish', () => {
-      if (!this.toCompress) return this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
+      this.nbWrittenFiles++;
+
+      if (!this.toCompress) {
+         this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
+
+         if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
+
+         return ;
+       }
 
       this.compress(`${this.outputFolder}sitemapindex.xml`, () => {
         this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml.gz`);
+        if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
       });
     });
 
@@ -102,6 +125,7 @@ class SitemapStream extends EventEmitter {
   }
 
   reset() {
+    this.isInjectOver = false;
     this.nbInjectedUrls = 0;
     this.writer = {};
   }
@@ -112,6 +136,8 @@ class SitemapStream extends EventEmitter {
   }
 
   done() {
+    this.isInjectOver = true;
+
     this.endOfFile();
 
     this.generateIndexFile();

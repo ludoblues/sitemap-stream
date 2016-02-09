@@ -83,6 +83,35 @@ describe('SitemapStream', () => {
         sitemap.writer.end();
       });
 
+      it('should emit a done event when it is the last file to write', done => {
+        sitemap.nbWrittenFiles = 1; // To simulate the sitemapindex file done
+        sitemap.nbInjectedUrls = sitemap.limit - 1;
+        sitemap.toCompress = false;
+
+        sitemap.on('done', nbFiles => {
+          done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+      });
+
+      it('should not emit a done event when it is not the last file to write', done => {
+        sitemap.nbInjectedUrls = sitemap.limit - 1;
+        sitemap.toCompress = false;
+
+        sitemap.on('done', nbFiles => {
+          done('should not fire this event');
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+
+        setTimeout(done, 1500);
+      });
+
       it('should not the file contain the mobile header', (done) => {
         sitemap.toCompress = false;
 
@@ -119,7 +148,6 @@ describe('SitemapStream', () => {
         sitemap = require('./index')();
       });
 
-      // TODO: To avoid multiple listeners, is there something cleaner ?
       beforeEach('mute & spy #endOfFile', () => {
         sinon.stub(sitemap, 'endOfFile', () => {});
       });
@@ -220,6 +248,35 @@ describe('SitemapStream', () => {
         sitemap.changeWriteStream();
 
         sitemap.writer.end();
+      });
+
+      it('should emit a done event when it is the last file to write in compress mode', done => {
+        sitemap.nbWrittenFiles = 1; // To simulate the sitemapindex file done
+        sitemap.nbInjectedUrls = sitemap.limit - 1;
+        sitemap.toCompress = true;
+
+        sitemap.on('done', nbFiles => {
+          done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+      });
+
+      it('should not emit a done event when it is not the last file to write in compress mode', done => {
+        sitemap.nbInjectedUrls = sitemap.limit - 1;
+        sitemap.toCompress = true;
+
+        sitemap.on('done', nbFiles => {
+          done('should not fire this event');
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+
+        setTimeout(done, 1500);
       });
     });
   });
@@ -490,6 +547,31 @@ describe('SitemapStream', () => {
       sitemap.generateIndexFile();
     });
 
+    it('should emit a done event when it is the last file to write', done => {
+      sitemap.nbWrittenFiles = 1; // To simulate the sitemap file done
+      sitemap.nbInjectedUrls = sitemap.limit - 1;
+      sitemap.toCompress = false;
+
+      sitemap.on('done', nbFiles => {
+        done();
+      });
+
+      sitemap.generateIndexFile();
+    });
+
+    it('should not emit a done event when it is not the last file to write', done => {
+      sitemap.nbInjectedUrls = sitemap.limit - 1;
+      sitemap.toCompress = false;
+
+      sitemap.on('done', nbFiles => {
+        done('should not fire this event');
+      });
+
+      sitemap.generateIndexFile();
+
+      setTimeout(done, 1500);
+    });
+
     it('should compress the file when asked in option', (done) => {
       sitemap.toCompress = true;
 
@@ -517,6 +599,31 @@ describe('SitemapStream', () => {
       });
 
       sitemap.generateIndexFile();
+    });
+
+    it('should emit a done event when it is the last file to write in compress mode', done => {
+      sitemap.nbWrittenFiles = 1; // To simulate the sitemap file done
+      sitemap.nbInjectedUrls = sitemap.limit - 1;
+      sitemap.toCompress = true;
+
+      sitemap.on('done', nbFiles => {
+        done();
+      });
+
+      sitemap.generateIndexFile();
+    });
+
+    it('should not emit a done event when it is not the last file to write in compress mode', done => {
+      sitemap.nbInjectedUrls = sitemap.limit - 1;
+      sitemap.toCompress = true;
+
+      sitemap.on('done', nbFiles => {
+        done('should not fire this event');
+      });
+
+      sitemap.generateIndexFile();
+
+      setTimeout(done, 1500);
     });
   });
 

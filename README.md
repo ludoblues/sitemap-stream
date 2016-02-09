@@ -52,12 +52,55 @@ Useful if you want to start writing a new sitemap using the same SitemapStream i
 SitemapStream use streams, so it emit events to let you know what happens.
 Here are the events you can listen to:
 
-- error
-- drain
-- sitemap-created
-- sitemapindex-created
+####  error
+````js
+sg.on('error', err => {
+  console.info(`Something wrong happened: ${err}`);
+});
+````
+####  drain
+````js
+let i = 0;
 
+function injectUrls() {
+  while (i<1000000) {
+    const isInjected = sg.inject(`http://test-${i}.com`);
 
+    if (!isInjected) return i;
+
+    i++;
+  }
+}
+
+injectUrls();
+
+sg.on('drain', () => {
+  console.info(`Because we have injected a big amount of lines in a short time, the stream could need to be drained, in this case, the sg#inject method returns false and the drain event is emitted when the stream is ready to write again`);
+
+  injectUrls();
+});
+````
+
+####  sitemap-created
+````js
+sg.on('sitemap-created', path => {
+  console.info(`A sitemap file has just been written here: ${path}`);
+});
+````
+
+####  sitemap-index
+````js
+sg.on('sitemap-index', path => {
+  console.info(`A sitemapindex file has just been written here: ${path}`);
+});
+````
+
+####  done
+````js
+sg.on('done', nbFiles => {
+  console.info(`The job is done, we have written ${nbFiles} files !`);
+});
+````
 
 ## Examples
 
@@ -92,13 +135,17 @@ With Events
   const sg = require('sitemap-stream')();
 
   sg.on('sitemap-created', (fileName) => {
-    // This listener will be triggered twice, one when the first 50 000 urls will be injected, and another time when you'll call the #done method  
+    // This listener will be trigger twice, one when the first 50 000 urls will be injected, and another time when you'll call the #done method  
     console.log('A sitemap has been created !');
   });
 
   sg.on('sitemapindex-index', () => {
-    // When this listener is triggered, consider the whole sitemaps generation done
+    // When  listener will be trigger once the sitemapindex file will be written
     console.log('The sitemapindex has been created, we are done !');
+  });
+
+  sg.on('done', () => {
+    console.info('Everything is done !');
   });
 
   for (let i=0; i<60000; i++) sg.inject(`/some-path-${i}`);
