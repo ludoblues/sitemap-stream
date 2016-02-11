@@ -40,16 +40,16 @@ class SitemapStream extends EventEmitter {
   }
 
   changeWriteStream() {
-    const nbFile = (this.nbInjectedUrls / this.limit) + 1;
+    const nbFile = Math.floor(this.nbInjectedUrls / this.limit) + 1;
 
     if (nbFile > 1) this.endOfFile();
 
     this.writer = fs.createWriteStream(`${this.outputFolder}sitemap-${nbFile}.xml`);
 
     this.writer.on('finish', () => {
-      this.nbWrittenFiles++;
-
       if (!this.toCompress) {
+        this.nbWrittenFiles++;
+
         this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml`);
 
         if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
@@ -57,14 +57,24 @@ class SitemapStream extends EventEmitter {
         return ;
       }
 
-      this.compress(`${this.outputFolder}sitemap-${nbFile}.xml`, () => {
+      this.compress(`${this.outputFolder}sitemap-${nbFile}.xml`, err => {
+        if (err) return this.emit('error', err);
+
+        this.nbWrittenFiles++;
+
         this.emit('sitemap-created', `${this.outputFolder}sitemap-${nbFile}.xml.gz`);
+
         if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
       });
     });
 
-    this.writer.on('error', this.emit);
-    this.writer.on('drain', this.emit);
+    this.writer.on('error', err => {
+      this.emit('error', err);
+    });
+
+    this.writer.on('drain', () => {
+      this.emit('drain', this.nbInjectedUrls);
+    });
 
     let mobileHeader = this.isMobile ? ' xmlns:mobile="http://www.google.com/schemas/sitemap-mobile/1.0"' : '';
     let header = `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${mobileHeader}>`;
@@ -96,13 +106,18 @@ class SitemapStream extends EventEmitter {
   generateIndexFile() {
     this.writer = fs.createWriteStream(`${this.outputFolder}sitemapindex.xml`);
 
-    this.writer.on('error', this.emit);
-    this.writer.on('drain', this.emit);
+    this.writer.on('error', err => {
+      this.emit('error', err);
+    });
+
+    this.writer.on('drain', () => {
+      this.emit('drain', this.nbInjectedUrls);
+    });
 
     this.writer.on('finish', () => {
-      this.nbWrittenFiles++;
-
       if (!this.toCompress) {
+        this.nbWrittenFiles++;
+
          this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml`);
 
          if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
@@ -110,8 +125,13 @@ class SitemapStream extends EventEmitter {
          return ;
        }
 
-      this.compress(`${this.outputFolder}sitemapindex.xml`, () => {
+      this.compress(`${this.outputFolder}sitemapindex.xml`, err => {
+        if (err) return this.emit('error', err);
+
+        this.nbWrittenFiles++;
+
         this.emit('sitemapindex-created', `${this.outputFolder}sitemapindex.xml.gz`);
+
         if (this.nbWrittenFiles === Math.ceil(this.nbInjectedUrls / this.limit)+1) this.emit('done', this.nbWrittenFiles);
       });
     });
@@ -144,7 +164,7 @@ class SitemapStream extends EventEmitter {
   }
 }
 
-module.exports = (conf) => {
+module.exports = conf => {
   const valideConf = Joi.validate(conf || {}, schemas.config);
 
   if (valideConf.error) throw new Error('Invalid parameters: ', valideConf.error);

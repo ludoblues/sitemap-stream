@@ -55,7 +55,7 @@ Here are the events you can listen to:
 ####  error
 ````js
 sg.on('error', err => {
-  console.info(`Something wrong happened: ${err}`);
+  console.error(`Something wrong happened: ${err}`);
 });
 ````
 ####  drain
@@ -72,13 +72,13 @@ function injectUrls() {
   }
 }
 
-injectUrls();
-
 sg.on('drain', () => {
   console.info(`Because we have injected a big amount of lines in a short time, the stream could need to be drained, in this case, the sg#inject method returns false and the drain event is emitted when the stream is ready to write again`);
 
   injectUrls();
 });
+
+injectUrls();
 ````
 
 ####  sitemap-created
