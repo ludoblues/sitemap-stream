@@ -65,6 +65,31 @@ describe('SitemapStream', () => {
         sitemap.endOfFile.restore();
       });
 
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
+      });
+
+      it('should emit the stream error events', done => {
+        sitemap.on('error', err => {
+          expect(err).to.be.equal('broadcast the error');
+          done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.emit('error', 'broadcast the error');
+      });
+
+      it('should emit the stream drain events', done => {
+        sitemap.on('drain', () => {
+          done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.emit('drain');
+      });
+
       it('should not call #endOfFile', () => {
         sitemap.changeWriteStream();
 
@@ -160,6 +185,10 @@ describe('SitemapStream', () => {
         sitemap.endOfFile.restore();
       });
 
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
+      });
+
       it('should call #endOfFile', () => {
         sitemap.nbInjectedUrls = sitemap.limit;
 
@@ -186,6 +215,10 @@ describe('SitemapStream', () => {
 
       afterEach('restore #endOfFile spy', () => {
         sitemap.endOfFile.restore();
+      });
+
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
       });
 
       it('should add the mobile header', (done) => {
@@ -222,6 +255,16 @@ describe('SitemapStream', () => {
 
       afterEach('restore #endOfFile spy', () => {
         sitemap.endOfFile.restore();
+      });
+
+      afterEach('restore #compress stub', () => {
+        if (typeof sitemap.compress.restore === 'undefined') return ;
+
+        sitemap.compress.restore();
+      });
+
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
       });
 
       it('should have created the file', (done) => {
@@ -278,6 +321,24 @@ describe('SitemapStream', () => {
 
         setTimeout(done, 1500);
       });
+
+      it('should emit an event if the compression fails', done => {
+        sinon.stub(sitemap, 'compress', () => {
+          sitemap.emit('error', 'compression failed');
+        });
+
+        sitemap.toCompress = true;
+        sitemap.date = new Date().toISOString();
+
+        sitemap.on('error', err => {
+          expect(err).to.be.equal('compression failed');
+          done();
+        });
+
+        sitemap.changeWriteStream();
+
+        sitemap.writer.end();
+      });
     });
   });
 
@@ -291,6 +352,10 @@ describe('SitemapStream', () => {
 
       afterEach('should remove generated xml files', (done) => {
         exec('rm *.xml*', done.bind(null, null));
+      });
+
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
       });
 
       it('should return an error', () => {
@@ -333,6 +398,10 @@ describe('SitemapStream', () => {
 
       afterEach('restore #changeWriteStream spy', () => {
         sitemap.changeWriteStream.restore();
+      });
+
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
       });
 
       it('should not call #changeWriteStream', () => {
@@ -384,6 +453,10 @@ describe('SitemapStream', () => {
         sitemap.changeWriteStream.restore();
       });
 
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
+      });
+
       it('should inject the given url with all parameters', (done) => {
         const entry = {
           url: '/some-path',
@@ -429,6 +502,10 @@ describe('SitemapStream', () => {
         sitemap.changeWriteStream.restore();
       });
 
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
+      });
+
       it('should not call #changeWriteStream', () => {
         expect(sitemap.changeWriteStream.callCount).to.be.equal(0);
 
@@ -459,6 +536,10 @@ describe('SitemapStream', () => {
 
       afterEach('restore #changeWriteStream spy', () => {
         sitemap.changeWriteStream.restore();
+      });
+
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
       });
 
       it('should call #changeWriteStream', () => {
@@ -492,6 +573,10 @@ describe('SitemapStream', () => {
         sitemap.changeWriteStream.restore();
       });
 
+      afterEach('remove listeners', () => {
+        sitemap.removeAllListeners();
+      });
+
       it('should not call #changeWriteStream', () => {
         expect(sitemap.changeWriteStream.callCount).to.be.equal(0);
 
@@ -513,7 +598,38 @@ describe('SitemapStream', () => {
       exec('rm *.xml*', done.bind(null, null));
     });
 
-    it('should emit an event "sitemapindex-created" when the sitemapindex is frozen', (done) => {
+    afterEach('restore #compress stub', () => {
+      if (typeof sitemap.compress.restore === 'undefined') return ;
+
+      sitemap.compress.restore();
+    });
+
+    afterEach('remove listeners', () => {
+      sitemap.removeAllListeners();
+    });
+
+    it('should emit the stream error events', done => {
+      sitemap.on('error', err => {
+        expect(err).to.be.equal('broadcast the error');
+        done();
+      });
+
+      sitemap.generateIndexFile();
+
+      sitemap.writer.emit('error', 'broadcast the error');
+    });
+
+    it('should emit the stream drain events', done => {
+      sitemap.on('drain', err => {
+        done();
+      });
+
+      sitemap.generateIndexFile();
+
+      sitemap.writer.emit('drain');
+    });
+
+    it('should emit an event "sitemapindex-created" when the sitemapindex is frozen', done => {
       sitemap.on('sitemapindex-created', () => {
         done();
       });
@@ -521,7 +637,7 @@ describe('SitemapStream', () => {
       sitemap.generateIndexFile();
     });
 
-    it('should have created a sitemapindex file', (done) => {
+    it('should have created a sitemapindex file', done => {
       sitemap.toCompress = false;
 
       sitemap.on('sitemapindex-created', () => {
@@ -625,6 +741,24 @@ describe('SitemapStream', () => {
 
       setTimeout(done, 1500);
     });
+
+    it('should emit an event if the compression fails', done => {
+      sinon.stub(sitemap, 'compress', () => {
+        sitemap.emit('error', 'compression failed');
+      });
+
+      sitemap.toCompress = true;
+
+      sitemap.nbInjectedUrls = sitemap.limit * 4;
+      sitemap.date = new Date().toISOString();
+
+      sitemap.on('error', err => {
+        expect(err).to.be.equal('compression failed');
+        done();
+      });
+
+      sitemap.generateIndexFile();
+    });
   });
 
   describe('#reset', () => {
@@ -632,7 +766,16 @@ describe('SitemapStream', () => {
 
     beforeEach('Override parameters', () => {
       sitemap.nbInjectedUrls = 1000;
+      sitemap.isInjectOver = true;
       sitemap.writer = { foo: 'bar' };
+    });
+
+    it('should reset the #isInjectOver', () => {
+      expect(sitemap.isInjectOver).to.be.equal(true);
+
+      sitemap.reset();
+
+      expect(sitemap.isInjectOver).to.be.equal(false);
     });
 
     it('should reset the #nbInjectedUrls', () => {
@@ -667,6 +810,10 @@ describe('SitemapStream', () => {
       exec('rm *.xml*', done.bind(null, null));
     });
 
+    afterEach('remove listeners', () => {
+      sitemap.removeAllListeners();
+    });
+
     it('should close the urlset element', (done) => {
       sitemap.writer.on('finish', () => {
         const fileContent = fs.readFileSync('test.xml');
@@ -697,6 +844,10 @@ describe('SitemapStream', () => {
 
     afterEach('restore #generateIndexFile spy', () => {
       sitemap.generateIndexFile.restore();
+    });
+
+    afterEach('remove listeners', () => {
+      sitemap.removeAllListeners();
     });
 
     it('should call #endOfFile', () => {
