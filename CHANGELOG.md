@@ -1,3 +1,7 @@
+## [1.6.1] - 2016-02-12
+### Fixed
+- Fix drain and error events propagation
+
 ## [1.6.0] - 2016-02-09
 ### Added
 - Add the done event
