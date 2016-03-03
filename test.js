@@ -609,24 +609,26 @@ describe('SitemapStream', () => {
     });
 
     it('should emit the stream error events', done => {
-      sitemap.on('error', err => {
-        expect(err).to.be.equal('broadcast the error');
-        done();
-      });
-
       sitemap.generateIndexFile();
+      sitemap.on('done', () => {
+        sitemap.on('error', err => {
+          expect(err).to.be.equal('broadcast the error');
+          done();
+        });
 
-      sitemap.writer.emit('error', 'broadcast the error');
+        sitemap.writer.emit('error', 'broadcast the error');
+      });
     });
 
     it('should emit the stream drain events', done => {
-      sitemap.on('drain', err => {
-        done();
-      });
-
       sitemap.generateIndexFile();
+      sitemap.on('done', () => {
+        sitemap.on('drain', err => {
+          done();
+        });
 
-      sitemap.writer.emit('drain');
+        sitemap.writer.emit('drain');
+      });
     });
 
     it('should emit an event "sitemapindex-created" when the sitemapindex is frozen', done => {
