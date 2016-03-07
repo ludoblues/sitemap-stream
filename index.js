@@ -98,7 +98,7 @@ class SitemapStream extends EventEmitter {
 
     const isWritten = this.writer.write(`${loc}${lastMod}${changeFreq}${priority}${mobile}`);
 
-    if (isWritten) this.nbInjectedUrls++;
+    this.nbInjectedUrls++;
 
     return isWritten;
   }

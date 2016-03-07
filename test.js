@@ -3,6 +3,7 @@
 const exec = require('child_process').exec;
 const fs = require('fs');
 const zlib = require('zlib');
+const WritableStream = require('readable-stream').Writable;
 
 const expect = require('chai').expect;
 const sinon = require('sinon');
@@ -583,6 +584,44 @@ describe('SitemapStream', () => {
         sitemap.inject('/some-path');
 
         expect(sitemap.changeWriteStream.callCount).to.be.equal(1);
+      });
+    });
+
+    context('We inject after high watermark reached', () => {
+      const limit = 20;
+      const highWaterMark = 16;
+      let sitemap;
+
+      beforeEach('generate a new sitemap generator', () => {
+        sitemap = require('./index')({ limit });
+      });
+
+      beforeEach('stub #changeWriteStream and spy on #writer', () => {
+        sinon.stub(sitemap, 'changeWriteStream', () => {
+          sitemap.writer = new WritableStream({
+            objectMode: true,
+            highWaterMark,
+            write: (chunk, encoding, callback) => {
+              setTimeout(() => callback(), 0);
+            }
+          });
+
+          sinon.spy(sitemap.writer, 'write');
+        });
+      });
+
+      it('should create new sitemap writer even when some entries was buffered', () => {
+        expect(sitemap.changeWriteStream.callCount).to.be.equal(0);
+
+        for (let i = 1; i <= (highWaterMark * 2); i++) {
+          const buffered = i >= highWaterMark && i <= limit;
+          let written = sitemap.inject('url');
+
+          expect(written).to.equal(!buffered);
+        }
+
+        expect(sitemap.changeWriteStream.callCount).to.be.equal(2);
+        expect(sitemap.writer.write.callCount).to.be.equal(12);
       });
     });
   });
