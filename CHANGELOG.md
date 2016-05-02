@@ -1,3 +1,10 @@
+## [2.0.0] - 2016-05-02
+### Fixed
+- Fix sitemap url content
+
+### Changed
+- The variable that refers the sitemaps output path
+
 ## [1.6.1] - 2016-02-12
 ### Fixed
 - Fix drain and error events propagation
