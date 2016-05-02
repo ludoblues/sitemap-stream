@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const url = require('url');
 const EventEmitter = require('events').EventEmitter;
 const zlib = require('zlib');
 
@@ -12,7 +13,7 @@ class SitemapStream extends EventEmitter {
   constructor(conf) {
     super();
 
-    this.hostname = conf.hostname;
+    this.sitemapDirectoryUrl = conf.sitemapDirectoryUrl;
     this.date = conf.date;
     this.limit = conf.limit;
     this.isMobile = conf.isMobile;
@@ -90,13 +91,13 @@ class SitemapStream extends EventEmitter {
 
     if (!this.nbInjectedUrls || this.nbInjectedUrls % this.limit === 0) this.changeWriteStream();
 
-    const loc = `<loc>${this.hostname}${entry.url}</loc>\n`;
+    const loc = `<loc>${entry.url}</loc>\n`;
     const lastMod = `<lastmod>${this.date}</lastmod>\n`;
     const changeFreq = entry.changeFreq ? `<changefreq>${entry.changeFreq}</changefreq>\n` : '';
     const priority = entry.priority ? `<priority>${entry.priority}</priority>\n` : '';
     const mobile = this.isMobile ? '<mobile:mobile/>\n' : '';
 
-    const isWritten = this.writer.write(`${loc}${lastMod}${changeFreq}${priority}${mobile}`);
+    const isWritten = this.writer.write(`<url>\n${loc}${lastMod}${changeFreq}${priority}${mobile}</url>\n`);
 
     this.nbInjectedUrls++;
 
@@ -139,7 +140,12 @@ class SitemapStream extends EventEmitter {
     this.writer.write('<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n');
 
     const nbSitemaps = (this.nbInjectedUrls / this.limit) + 1;
-    for (let i=1; i<=nbSitemaps; i++) this.writer.write(`<sitemap>\n<loc>http://www.example.com/sitemap-${i}.xml</loc>\n<lastmod>${this.date}</lastmod>\n</sitemap>\n`);
+    for (let i=1; i<=nbSitemaps; i++) {
+      const ext = this.toCompress ? 'xml.gz' : 'xml';
+      const loc = url.resolve(this.sitemapDirectoryUrl, `sitemap-${i}.${ext}`);
+
+      this.writer.write(`<sitemap>\n<loc>${loc}</loc>\n<lastmod>${this.date}</lastmod>\n</sitemap>\n`);
+    }
 
     this.writer.end();
   }

@@ -19,7 +19,7 @@ npm i sitemap-stream
 #### SitemapStream#Constructor(options):
 ```js
 {
-  hostname: String,
+  sitemapDirectoryUrl: String,
   limit: Number, // (default: 50000)
   isMobile: Boolean, // (default: false)
   outputFolder: String // (default: './')

@@ -4,7 +4,7 @@ const Joi = require('joi');
 
 module.exports = {
   config: Joi.object({
-    hostname: Joi.string().hostname().default(''),
+    sitemapDirectoryUrl: Joi.string().uri().default(''),
     date: Joi.date().iso().default(new Date().toISOString()),
     limit: Joi.number().integer().min(1).default(50000),
     isMobile: Joi.boolean().default(false),
