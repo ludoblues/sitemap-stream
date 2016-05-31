@@ -698,7 +698,7 @@ describe('SitemapStream', () => {
       sitemap.on('sitemapindex-created', () => {
         const fileContent = fs.readFileSync('sitemapindex.xml');
 
-        expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n`);
+        expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n</sitemapindex>\n`);
 
         done();
       });
@@ -751,7 +751,7 @@ describe('SitemapStream', () => {
         compressionStream.on('finish', () => {
           const fileContent = fs.readFileSync('sitemapindex.xml');
 
-          expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n`);
+          expect(fileContent.toString()).to.be.equal(`<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n<sitemap>\n<loc>http://www.example.com/sitemap-1.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-2.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-3.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-4.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n<sitemap>\n<loc>http://www.example.com/sitemap-5.xml.gz</loc>\n<lastmod>${sitemap.date}</lastmod>\n</sitemap>\n</sitemapindex>\n`);
 
           done();
         });
