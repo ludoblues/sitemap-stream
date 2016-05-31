@@ -147,6 +147,8 @@ class SitemapStream extends EventEmitter {
       this.writer.write(`<sitemap>\n<loc>${loc}</loc>\n<lastmod>${this.date}</lastmod>\n</sitemap>\n`);
     }
 
+    this.writer.write('</sitemapindex>\n');
+
     this.writer.end();
   }
 
