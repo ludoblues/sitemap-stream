@@ -1,3 +1,7 @@
+## [2.0.1] - 2016-05-31
+### Fixed
+- Fix sitemapindex xml closing tag
+
 ## [2.0.0] - 2016-05-02
 ### Fixed
 - Fix sitemap url content
